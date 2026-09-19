@@ -1,0 +1,7 @@
+name: orkney_wind_forecast
+
+entry_points:
+  main:
+    parameters:
+      data_path: {type: str, default: "data"}
+    command: "python fernando_ml.py --data-path {data_path}"

@@ -1,0 +1,9 @@
+mlflow
+pandas==2.2.3
+numpy==2.1.3
+scikit-learn==1.5.2
+cloudpickle==3.1.0
+skops==0.13.0
+seaborn
+matplotlib
+xgboost

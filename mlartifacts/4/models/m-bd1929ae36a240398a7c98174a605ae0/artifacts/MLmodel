@@ -1,0 +1,37 @@
+artifact_path: mlflow-artifacts:/4/models/m-bd1929ae36a240398a7c98174a605ae0/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.skops
+    predict_fn: predict
+    python_version: 3.14.2
+  sklearn:
+    code: null
+    pickled_model: model.skops
+    serialization_format: skops
+    sklearn_version: 1.9.1
+    skops_trusted_types:
+    - xgboost.core.Booster
+    - xgboost.sklearn.XGBRegressor
+is_signature_from_type_hint: false
+mlflow_version: 3.16.0
+model_id: m-bd1929ae36a240398a7c98174a605ae0
+model_size_bytes: 365912
+model_uuid: m-bd1929ae36a240398a7c98174a605ae0
+prompts: null
+run_id: 9779b746e3bc473f8c4a0a8a205b3d6f
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "string", "name": "Direction", "required": true}, {"type": "double",
+    "name": "Speed", "required": true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "float32", "shape": [-1]}}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2026-09-19 17:17:21.102356'

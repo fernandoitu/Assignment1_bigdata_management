@@ -1,0 +1,14 @@
+{
+  "dataframe_split": {
+    "columns": [
+      "Direction",
+      "Speed"
+    ],
+    "data": [
+      [
+        "SSE",
+        11.176
+      ]
+    ]
+  }
+}

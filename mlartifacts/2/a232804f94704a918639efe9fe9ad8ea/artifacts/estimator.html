@@ -1,0 +1,2658 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8"/>
+  </head>
+  <body>
+    <style>.sk-global {
+  /* Definition of color scheme common for light and dark mode */
+  --sklearn-color-text: #000;
+  --sklearn-color-text-muted: #666;
+  --sklearn-color-line: gray;
+  /* Definition of color scheme for unfitted estimators */
+  --sklearn-color-unfitted-level-0: #fff5e6;
+  --sklearn-color-unfitted-level-1: #f6e4d2;
+  --sklearn-color-unfitted-level-2: #ffe0b3;
+  --sklearn-color-unfitted-level-3: chocolate;
+  /* Definition of color scheme for fitted estimators */
+  --sklearn-color-fitted-level-0: #f0f8ff;
+  --sklearn-color-fitted-level-1: #d4ebff;
+  --sklearn-color-fitted-level-2: #b3dbfd;
+  --sklearn-color-fitted-level-3: cornflowerblue;
+}
+
+.sk-global.light {
+  /* Specific color for light theme */
+  --sklearn-color-text-on-default-background: black;
+  --sklearn-color-background: white;
+  --sklearn-color-border-box: black;
+  --sklearn-color-icon: #696969;
+}
+
+.sk-global.dark {
+  --sklearn-color-text-on-default-background: white;
+  --sklearn-color-background: #111;
+  --sklearn-color-border-box: white;
+  --sklearn-color-icon: #878787;
+}
+
+.sk-global {
+  color: var(--sklearn-color-text);
+}
+
+.sk-global pre {
+  padding: 0;
+}
+
+.sk-global input.sk-hidden--visually {
+  border: 0;
+  clip-path: inset(100%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.sk-global div.sk-dashed-wrapped {
+  border: 1px dashed var(--sklearn-color-line);
+  margin: 0 0.4em 0.5em 0.4em;
+  box-sizing: border-box;
+  padding-bottom: 0.4em;
+  background-color: var(--sklearn-color-background);
+}
+
+.sk-global div.sk-container {
+  /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
+     but bootstrap.min.css set `[hidden] { display: none !important; }`
+     so we also need the `!important` here to be able to override the
+     default hidden behavior on the sphinx rendered scikit-learn.org.
+     See: https://github.com/scikit-learn/scikit-learn/issues/21755 */
+  display: inline-block !important;
+  position: relative;
+}
+
+.sk-global div.sk-text-repr-fallback {
+  display: none;
+}
+
+div.sk-parallel-item,
+div.sk-serial,
+div.sk-item {
+  /* draw centered vertical line to link estimators */
+  background-image: linear-gradient(var(--sklearn-color-text-on-default-background), var(--sklearn-color-text-on-default-background));
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+/* Parallel-specific style estimator block */
+
+.sk-global div.sk-parallel-item::after {
+  content: "";
+  width: 100%;
+  border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
+  flex-grow: 1;
+}
+
+.sk-global div.sk-parallel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background-color: var(--sklearn-color-background);
+  position: relative;
+}
+
+.sk-global div.sk-parallel-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.sk-global div.sk-parallel-item:first-child::after {
+  align-self: flex-end;
+  width: 50%;
+}
+
+.sk-global div.sk-parallel-item:last-child::after {
+  align-self: flex-start;
+  width: 50%;
+}
+
+.sk-global div.sk-parallel-item:only-child::after {
+  width: 0;
+}
+
+/* Serial-specific style estimator block */
+
+.sk-global div.sk-serial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--sklearn-color-background);
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+
+/* Toggleable style: style used for estimator/Pipeline/ColumnTransformer box that is
+clickable and can be expanded/collapsed.
+- Pipeline and ColumnTransformer use this feature and define the default style
+- Estimators will overwrite some part of the style using the `sk-estimator` class
+*/
+
+/* Pipeline and ColumnTransformer style (default) */
+
+.sk-global div.sk-toggleable {
+  /* Default theme specific background. It is overwritten whether we have a
+  specific estimator or a Pipeline/ColumnTransformer */
+  background-color: var(--sklearn-color-background);
+}
+
+/* Toggleable label */
+.sk-global label.sk-toggleable__label {
+  cursor: pointer;
+  display: flex;
+  width: 100%;
+  margin-bottom: 0;
+  padding: 0.5em;
+  box-sizing: border-box;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+}
+
+.sk-global label.sk-toggleable__label .caption {
+  font-size: 0.6rem;
+  font-weight: lighter;
+  color: var(--sklearn-color-text-muted);
+}
+
+.sk-global label.sk-toggleable__label-arrow:before {
+  /* Arrow on the left of the label */
+  content: "▸";
+  float: left;
+  margin-right: 0.25em;
+  color: var(--sklearn-color-icon);
+}
+
+.sk-global label.sk-toggleable__label-arrow:hover:before {
+  color: var(--sklearn-color-text);
+}
+
+/* Toggleable content - dropdown */
+
+.sk-global div.sk-toggleable__content {
+  display: none;
+  text-align: left;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+.sk-global div.sk-toggleable__content.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+.sk-global div.sk-toggleable__content pre {
+  margin: 0.2em;
+  border-radius: 0.25em;
+  color: var(--sklearn-color-text);
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+.sk-global div.sk-toggleable__content.fitted pre {
+  /* unfitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+.sk-global input.sk-toggleable__control:checked~div.sk-toggleable__content {
+  /* Expand drop-down */
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.sk-global input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+  content: "▾";
+}
+
+/* Pipeline/ColumnTransformer-specific style */
+
+.sk-global div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+.sk-global div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator-specific style */
+
+/* Colorize estimator box */
+.sk-global div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+.sk-global div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+.sk-global div.sk-label label.sk-toggleable__label,
+.sk-global div.sk-label label {
+  /* The background is the default theme color */
+  color: var(--sklearn-color-text-on-default-background);
+}
+
+/* On hover, darken the color of the background */
+.sk-global div.sk-label:hover label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+/* Label box, darken color on hover, fitted */
+.sk-global div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator label */
+
+.sk-global div.sk-label label {
+  font-family: monospace;
+  font-weight: bold;
+  line-height: 1.2em;
+}
+
+.sk-global div.sk-label-container {
+  text-align: center;
+}
+
+/* Estimator-specific */
+.sk-global div.sk-estimator {
+  font-family: monospace;
+  border: 1px dotted var(--sklearn-color-border-box);
+  border-radius: 0.25em;
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+.sk-global div.sk-estimator.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+/* on hover */
+.sk-global div.sk-estimator:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+.sk-global div.sk-estimator.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Specification for estimator info (e.g. "i" and "?") */
+
+/* Common style for "i" and "?" */
+
+.sk-estimator-doc-link,
+a:link.sk-estimator-doc-link,
+a:visited.sk-estimator-doc-link {
+  float: right;
+  font-size: smaller;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-unfitted-level-0);
+  border-radius: 1em;
+  height: 1em;
+  width: 1em;
+  text-decoration: none !important;
+  margin-left: 0.5em;
+  text-align: center;
+  /* unfitted */
+  border: var(--sklearn-color-unfitted-level-3) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted,
+a:link.sk-estimator-doc-link.fitted,
+a:visited.sk-estimator-doc-link.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3) 1pt solid;
+  color: var(--sklearn-color-fitted-level-3);
+}
+
+/* On hover */
+div.sk-estimator:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover,
+div.sk-label-container:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  border: var(--sklearn-color-fitted-level-0) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-0);
+  text-decoration: none;
+}
+
+div.sk-estimator.fitted:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover,
+div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+  border: var(--sklearn-color-fitted-level-0) 1pt solid;
+  color: var(--sklearn-color-fitted-level-0);
+  text-decoration: none;
+}
+
+/* Span, style for the box shown on hovering the info icon */
+.sk-estimator-doc-link span {
+  display: none;
+  z-index: 9999;
+  position: relative;
+  font-weight: normal;
+  right: .2ex;
+  padding: .5ex;
+  margin: .5ex;
+  width: min-content;
+  min-width: 20ex;
+  max-width: 50ex;
+  color: var(--sklearn-color-text);
+  box-shadow: 2pt 2pt 4pt #999;
+  /* unfitted */
+  background: var(--sklearn-color-unfitted-level-0);
+  border: .5pt solid var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted span {
+  /* fitted */
+  background: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3);
+}
+
+.sk-estimator-doc-link:hover span {
+  display: block;
+}
+
+/* "?"-specific style due to the `<a>` HTML tag */
+
+.sk-global a.estimator_doc_link {
+  float: right;
+  font-size: 1rem;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-unfitted-level-0);
+  border-radius: 1rem;
+  height: 1rem;
+  width: 1rem;
+  text-decoration: none;
+  /* unfitted */
+  color: var(--sklearn-color-unfitted-level-1);
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+}
+
+.sk-global a.estimator_doc_link.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+.sk-global a.estimator_doc_link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+.sk-global a.estimator_doc_link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+}
+
+.sk-top-container.sk-global {
+  /* pydata-sphinx-theme hides overflow, so scrolling is disabled.
+   We need to set it to !important and add tabindex="0" in the HTML
+   to allow keyboard-only users to navigate the display. */
+  overflow-x: scroll !important;
+  max-width: 100%;
+}
+
+.estimator-table {
+    font-family: monospace;
+}
+
+.estimator-table summary {
+    padding: .5rem;
+    cursor: pointer;
+}
+
+.estimator-table summary::marker {
+    font-size: 0.7rem;
+}
+
+.estimator-table details[open] {
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+    padding-bottom: 0.3rem;
+}
+
+.estimator-table .parameters-table {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: 0;
+}
+
+.estimator-table .parameters-table tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+.estimator-table .parameters-table tr:nth-child(even) {
+    background-color: #f6f6f6;
+}
+
+.estimator-table .parameters-table tr:hover td {
+    background-color: #e0e0e0;
+}
+
+.estimator-table table :is(td, th) {
+    border: 1px solid rgba(106, 105, 104, 0.232);
+}
+
+/*
+    `table td`is set in notebook with right text-align.
+    We need to overwrite it.
+*/
+.estimator-table table td.param {
+    text-align: left;
+    position: relative;
+    padding: 0;
+}
+
+.user-set td {
+    color:rgb(255, 94, 0);
+    text-align: left !important;
+}
+
+.user-set td.value {
+    color:rgb(255, 94, 0);
+    background-color: transparent;
+}
+
+.default td, .estimator-table th {
+    color: black;
+    text-align: left !important;
+}
+
+.user-set td i,
+.default td i {
+    color: black;
+}
+
+td.fitted-att-type {
+    white-space: preserve nowrap;
+}
+
+/*
+    Styles for parameter documentation links
+    We need styling for visited so jupyter doesn't overwrite it
+*/
+a.param-doc-link,
+a.param-doc-link:link,
+a.param-doc-link:visited {
+    text-decoration: underline dashed;
+    text-underline-offset: .3em;
+    color: inherit;
+    display: block;
+    padding: .5em;
+}
+
+@supports(anchor-name: --doc-link) {
+    a.param-doc-link,
+    a.param-doc-link:link,
+    a.param-doc-link:visited {
+    anchor-name: --doc-link;
+    }
+}
+
+/* "hack" to make the entire area of the cell containing the link clickable */
+a.param-doc-link::before {
+    position: absolute;
+    content: "";
+    inset: 0;
+}
+
+.param-doc-description {
+    display: none;
+    position: absolute;
+    z-index: 9999;
+    left: 0;
+    padding: .5ex;
+    margin-left: 1.5em;
+    color: var(--sklearn-color-text);
+    box-shadow: .3em .3em .4em #999;
+    width: max-content;
+    text-align: left;
+    max-height: 10em;
+    overflow-y: auto;
+
+    /* unfitted */
+    background: var(--sklearn-color-unfitted-level-0);
+    border: thin solid var(--sklearn-color-unfitted-level-3);
+}
+
+@supports(position-area: center right) {
+    .param-doc-description {
+    position-area: center right;
+    position: fixed;
+    margin-left: 0;
+    }
+}
+
+/* Fitted state for parameter tooltips */
+.fitted .param-doc-description {
+    /* fitted */
+    background: var(--sklearn-color-fitted-level-0);
+    border: thin solid var(--sklearn-color-fitted-level-3);
+}
+
+.param-doc-link:hover .param-doc-description {
+    display: block;
+}
+
+.copy-paste-icon {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjUgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTIwOCAwTDMzMi4xIDBjMTIuNyAwIDI0LjkgNS4xIDMzLjkgMTQuMWw2Ny45IDY3LjljOSA5IDE0LjEgMjEuMiAxNC4xIDMzLjlMNDQ4IDMzNmMwIDI2LjUtMjEuNSA0OC00OCA0OGwtMTkyIDBjLTI2LjUgMC00OC0yMS41LTQ4LTQ4bDAtMjg4YzAtMjYuNSAyMS41LTQ4IDQ4LTQ4ek00OCAxMjhsODAgMCAwIDY0LTY0IDAgMCAyNTYgMTkyIDAgMC0zMiA2NCAwIDAgNDhjMCAyNi41LTIxLjUgNDgtNDggNDhMNDggNTEyYy0yNi41IDAtNDgtMjEuNS00OC00OEwwIDE3NmMwLTI2LjUgMjEuNS00OCA0OC00OHoiLz48L3N2Zz4=);
+    background-repeat: no-repeat;
+    background-size: 14px 14px;
+    background-position: 0;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    background-color: transparent;
+}
+
+.copy-paste-icon:focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: 1px;
+}
+
+.features {
+  font-family: monospace;
+  cursor: pointer;
+  background-color: var(--sklearn-color-unfitted-level-0);
+  border: 1px dotted var(--sklearn-color-border-box);
+  border-radius: .20em;
+  margin-bottom: 0.5em;
+  font-size: inherit; /* Needed for jupyter */
+}
+
+.features.fitted {
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+.features summary {
+  cursor: pointer;
+  display: flex;
+  margin-bottom: 0;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  padding: .25em;
+}
+
+.features details[open] > summary {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+  border-radius: .20em 0 0 0;
+}
+
+.features.fitted details[open] > summary {
+  background-color: var(--sklearn-color-fitted-level-2);
+  border-radius: .20em 0 0 0;
+}
+
+.features details > summary .arrow::before {
+  content: "▸";
+  color: grey;
+}
+
+.features details[open] > summary .arrow::before {
+  content: "▾";
+}
+
+.features details:hover > summary {
+  margin: 0;
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+.features.fitted details:hover > summary {
+  margin: 0;
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+.features .features-container {
+  max-height: 10em;
+  overflow: auto;
+  scrollbar-width: thin;
+  padding: .25em 0.1rem;
+  background-color: var(--sklearn-color-unfitted-level-0);
+  border-radius: 0 0 .5em .5em;
+}
+
+.features.fitted .features-container {
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+.features .image-container {
+  block-size: 1em;
+  inline-size: 1em;
+  padding: 0;
+  margin: 0%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.features .copy-paste-icon {
+  background-size: 1em 1em;
+  width: 1em;
+  height: 1em;
+  filter: grayscale(100%) opacity(60%);
+}
+
+.features .features-container table {
+  width: 100%;
+  margin: 0.01em;
+}
+
+.features .features-container table tr:nth-child(odd) {
+  background-color: #fff;
+}
+
+.features .features-container table tr:nth-child(even) {
+  background-color: #f6f6f6;
+}
+
+.features .features-container table tr:hover {
+  background-color: #e0e0e0;
+}
+
+.features .features-container table {
+  table-layout: inherit;
+}
+
+.features .features-container table td {
+  text-align: left;
+  padding: 0 0.5em;
+  border: 1px solid rgba(106, 105, 104, 0.232);
+  white-space: nowrap;
+  color: var(--sklearn-color-text);
+}
+
+.total_features {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5em;
+}
+</style><body><div id="sk-container-id-11" tabindex="0" class="sk-top-container sk-global"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;prep&#x27;,
+                 ColumnTransformer(transformers=[(&#x27;cat&#x27;,
+                                                  OneHotEncoder(handle_unknown=&#x27;ignore&#x27;),
+                                                  [&#x27;Direction&#x27;]),
+                                                 (&#x27;num&#x27;, &#x27;passthrough&#x27;,
+                                                  [&#x27;Speed&#x27;])])),
+                (&#x27;reg&#x27;,
+                 XGBRegressor(base_score=None, booster=None, callbacks=None,
+                              colsample_bylevel=None, colsample_bynode=None,
+                              colsample_bytree=None, device=None,
+                              early_stopping_rounds=None,
+                              enable_categorical=True, eval...
+                              feature_types=None, feature_weights=None,
+                              gamma=None, grow_policy=None,
+                              importance_type=None,
+                              interaction_constraints=None, learning_rate=None,
+                              max_bin=None, max_cat_threshold=None,
+                              max_cat_to_onehot=None, max_delta_step=None,
+                              max_depth=None, max_leaves=None,
+                              min_child_weight=None, missing=nan,
+                              monotone_constraints=None, multi_strategy=None,
+                              n_estimators=None, n_jobs=None,
+                              num_parallel_tree=None, ...))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually sk-global" id="sk-estimator-id-67" type="checkbox" ><label for="sk-estimator-id-67" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>Pipeline</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
+        <div class="estimator-table">
+            <details>
+                <summary>Parameters</summary>
+                <table class="parameters-table">
+                  <tbody>
+                    
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy steps to clipboard"
+                 onclick="copyToClipboard('steps',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-steps;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.pipeline.Pipeline.html#:~:text=steps,-list%20of%20tuples">
+            steps
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-steps;">
+            steps: list of tuples<br><br>List of (name of step, estimator) tuples that are to be chained in<br>sequential order. To be compatible with the scikit-learn API, all steps<br>must define `fit`. All non-last steps must also define `transform`. See<br>:ref:`Combining Estimators &lt;combining_estimators&gt;` for more details.</span>
+        </a>
+    </td>
+            <td class="value">[(&#x27;prep&#x27;, ...), (&#x27;reg&#x27;, ...)]</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy transform_input to clipboard"
+                 onclick="copyToClipboard('transform_input',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-transform_input;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.pipeline.Pipeline.html#:~:text=transform_input,-list%20of%20str%2C%20default%3DNone">
+            transform_input
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-transform_input;">
+            transform_input: list of str, default=None<br><br>The names of the :term:`metadata` parameters that should be transformed by the<br>pipeline before passing it to the step consuming it.<br><br>This enables transforming some input arguments to ``fit`` (other than ``X``)<br>to be transformed by the steps of the pipeline up to the step which requires<br>them. Requirement is defined via :ref:`metadata routing &lt;metadata_routing&gt;`.<br>For instance, this can be used to pass a validation set through the pipeline.<br><br>You can only set this if metadata routing is enabled, which you<br>can enable using ``sklearn.set_config(enable_metadata_routing=True)``.<br><br>.. versionadded:: 1.6</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy memory to clipboard"
+                 onclick="copyToClipboard('memory',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-memory;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.pipeline.Pipeline.html#:~:text=memory,-str%20or%20object%20with%20the%20joblib.Memory%20interface%2C%20default%3DNone">
+            memory
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-memory;">
+            memory: str or object with the joblib.Memory interface, default=None<br><br>Used to cache the fitted transformers of the pipeline. The last step<br>will never be cached, even if it is a transformer. By default, no<br>caching is performed. If a string is given, it is the path to the<br>caching directory. Enabling caching triggers a clone of the transformers<br>before fitting. Therefore, the transformer instance given to the<br>pipeline cannot be inspected directly. Use the attribute ``named_steps``<br>or ``steps`` to inspect estimators within the pipeline. Caching the<br>transformers is advantageous when fitting is time consuming. See<br>:ref:`sphx_glr_auto_examples_neighbors_plot_caching_nearest_neighbors.py`<br>for an example on how to enable caching.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy verbose to clipboard"
+                 onclick="copyToClipboard('verbose',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-verbose;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.pipeline.Pipeline.html#:~:text=verbose,-bool%2C%20default%3DFalse">
+            verbose
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-verbose;">
+            verbose: bool, default=False<br><br>If True, the time elapsed while fitting each step will be printed as it<br>is completed.</span>
+        </a>
+    </td>
+            <td class="value">False</td>
+        </tr>
+    
+                  </tbody>
+                </table>
+            </details>
+        </div>
+    
+        <div class="estimator-table">
+            <details>
+                <summary>Fitted attributes</summary>
+                <table class="parameters-table">
+                    <tbody>
+                        <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Value</th>
+                        </tr>
+                        
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-feature_names_in_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.pipeline.Pipeline.html#:~:text=feature_names_in_,-ndarray%20of%20shape%20%28n_features_in_%2C%29">
+            feature_names_in_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-feature_names_in_;">
+            feature_names_in_: ndarray of shape (`n_features_in_`,)<br><br>Names of features seen during :term:`fit`. Only defined if the<br>underlying estimator exposes such an attribute when fit.<br><br>.. versionadded:: 1.0</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">ndarray[object](2,)</td>
+           <td>[&#x27;Direction&#x27;,&#x27;Speed&#x27;]</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-n_features_in_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.pipeline.Pipeline.html#:~:text=n_features_in_,-int">
+            n_features_in_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-n_features_in_;">
+            n_features_in_: int<br><br>Number of features seen during :term:`fit`. Only defined if the<br>underlying first estimator in `steps` exposes such an attribute<br>when fit.<br><br>.. versionadded:: 0.24</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">int</td>
+           <td>2</td>
+
+
+       </tr>
+    
+                    </tbody>
+                </table>
+            </details>
+        </div>
+    </div></div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually sk-global" id="sk-estimator-id-68" type="checkbox" ><label for="sk-estimator-id-68" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>prep: ColumnTransformer</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.compose.ColumnTransformer.html">?<span>Documentation for prep: ColumnTransformer</span></a></div></label><div class="sk-toggleable__content fitted" data-param-prefix="prep__">
+        <div class="estimator-table">
+            <details>
+                <summary>Parameters</summary>
+                <table class="parameters-table">
+                  <tbody>
+                    
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy transformers to clipboard"
+                 onclick="copyToClipboard('transformers',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-transformers;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=transformers,-list%20of%20tuples">
+            transformers
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-transformers;">
+            transformers: list of tuples<br><br>List of (name, transformer, columns) tuples specifying the<br>transformer objects to be applied to subsets of the data.<br><br>name : str<br>    Like in Pipeline and FeatureUnion, this allows the transformer and<br>    its parameters to be set using ``set_params`` and searched in grid<br>    search.<br>transformer : {&#x27;drop&#x27;, &#x27;passthrough&#x27;} or estimator<br>    Estimator must support :term:`fit` and :term:`transform`.<br>    Special-cased strings &#x27;drop&#x27; and &#x27;passthrough&#x27; are accepted as<br>    well, to indicate to drop the columns or to pass them through<br>    untransformed, respectively.<br>columns :  str, array-like of str, int, array-like of int,                 array-like of bool, slice or callable<br>    Indexes the data on its second axis. Integers are interpreted as<br>    positional columns, while strings can reference DataFrame columns<br>    by name.  A scalar string or int should be used where<br>    ``transformer`` expects X to be a 1d array-like (vector),<br>    otherwise a 2d array will be passed to the transformer.<br>    A callable is passed the input data `X` and can return any of the<br>    above. To select multiple columns by name or dtype, you can use<br>    :obj:`make_column_selector`.</span>
+        </a>
+    </td>
+            <td class="value">[(&#x27;cat&#x27;, ...), (&#x27;num&#x27;, ...)]</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy remainder to clipboard"
+                 onclick="copyToClipboard('remainder',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-remainder;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=remainder,-%7B%27drop%27%2C%20%27passthrough%27%7D%20or%20estimator%2C%20default%3D%27drop%27">
+            remainder
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-remainder;">
+            remainder: {&#x27;drop&#x27;, &#x27;passthrough&#x27;} or estimator, default=&#x27;drop&#x27;<br><br>By default, only the specified columns in `transformers` are<br>transformed and combined in the output, and the non-specified<br>columns are dropped. (default of ``&#x27;drop&#x27;``).<br>By specifying ``remainder=&#x27;passthrough&#x27;``, all remaining columns that<br>were not specified in `transformers`, but present in the data passed<br>to `fit` will be automatically passed through. This subset of columns<br>is concatenated with the output of the transformers. For dataframes,<br>extra columns not seen during `fit` will be excluded from the output<br>of `transform`.<br>By setting ``remainder`` to be an estimator, the remaining<br>non-specified columns will use the ``remainder`` estimator. The<br>estimator must support :term:`fit` and :term:`transform`.<br>Note that using this feature requires that the DataFrame columns<br>input at :term:`fit` and :term:`transform` have identical order.</span>
+        </a>
+    </td>
+            <td class="value">&#x27;drop&#x27;</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy sparse_threshold to clipboard"
+                 onclick="copyToClipboard('sparse_threshold',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-sparse_threshold;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=sparse_threshold,-float%2C%20default%3D0.3">
+            sparse_threshold
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-sparse_threshold;">
+            sparse_threshold: float, default=0.3<br><br>If the output of the different transformers contains sparse matrices,<br>these will be stacked as a sparse matrix if the overall density is<br>lower than this value. Use ``sparse_threshold=0`` to always return<br>dense.  When the transformed output consists of all dense data, the<br>stacked result will be dense, and this keyword will be ignored.</span>
+        </a>
+    </td>
+            <td class="value">0.3</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy n_jobs to clipboard"
+                 onclick="copyToClipboard('n_jobs',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-n_jobs;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=n_jobs,-int%2C%20default%3DNone">
+            n_jobs
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-n_jobs;">
+            n_jobs: int, default=None<br><br>Number of jobs to run in parallel.<br>``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.<br>``-1`` means using all processors. See :term:`Glossary &lt;n_jobs&gt;`<br>for more details.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy transformer_weights to clipboard"
+                 onclick="copyToClipboard('transformer_weights',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-transformer_weights;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=transformer_weights,-dict%2C%20default%3DNone">
+            transformer_weights
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-transformer_weights;">
+            transformer_weights: dict, default=None<br><br>Multiplicative weights for features per transformer. The output of the<br>transformer is multiplied by these weights. Keys are transformer names,<br>values the weights.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy verbose to clipboard"
+                 onclick="copyToClipboard('verbose',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-verbose;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=verbose,-bool%2C%20default%3DFalse">
+            verbose
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-verbose;">
+            verbose: bool, default=False<br><br>If True, the time elapsed while fitting each transformer will be<br>printed as it is completed.</span>
+        </a>
+    </td>
+            <td class="value">False</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy verbose_feature_names_out to clipboard"
+                 onclick="copyToClipboard('verbose_feature_names_out',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-verbose_feature_names_out;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=verbose_feature_names_out,-bool%2C%20str%20or%20Callable%5B%5Bstr%2C%20str%5D%2C%20str%5D%2C%20default%3DTrue">
+            verbose_feature_names_out
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-verbose_feature_names_out;">
+            verbose_feature_names_out: bool, str or Callable[[str, str], str], default=True<br><br>- If True, :meth:`ColumnTransformer.get_feature_names_out` will prefix<br>  all feature names with the name of the transformer that generated that<br>  feature. It is equivalent to setting<br>  `verbose_feature_names_out=&quot;{transformer_name}__{feature_name}&quot;`.<br>- If False, :meth:`ColumnTransformer.get_feature_names_out` will not<br>  prefix any feature names and will error if feature names are not<br>  unique.<br>- If ``Callable[[str, str], str]``,<br>  :meth:`ColumnTransformer.get_feature_names_out` will rename all the features<br>  using the name of the transformer. The first argument of the callable is the<br>  transformer name and the second argument is the feature name. The returned<br>  string will be the new feature name.<br>- If ``str``, it must be a string ready for formatting. The given string will<br>  be formatted using two field names: ``transformer_name`` and ``feature_name``.<br>  e.g. ``&quot;{feature_name}__{transformer_name}&quot;``. See :meth:`str.format` method<br>  from the standard library for more info.<br><br>.. versionadded:: 1.0<br><br>.. versionchanged:: 1.6<br>    `verbose_feature_names_out` can be a callable or a string to be formatted.</span>
+        </a>
+    </td>
+            <td class="value">True</td>
+        </tr>
+    
+                  </tbody>
+                </table>
+            </details>
+        </div>
+    
+        <div class="estimator-table">
+            <details>
+                <summary>Fitted attributes</summary>
+                <table class="parameters-table">
+                    <tbody>
+                        <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Value</th>
+                        </tr>
+                        
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-feature_names_in_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=feature_names_in_,-ndarray%20of%20shape%20%28n_features_in_%2C%29">
+            feature_names_in_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-feature_names_in_;">
+            feature_names_in_: ndarray of shape (`n_features_in_`,)<br><br>Names of features seen during :term:`fit`. Defined only when `X`<br>has feature names that are all strings.<br><br>.. versionadded:: 1.0</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">ndarray[object](2,)</td>
+           <td>[&#x27;Direction&#x27;,&#x27;Speed&#x27;]</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-n_features_in_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=n_features_in_,-int">
+            n_features_in_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-n_features_in_;">
+            n_features_in_: int<br><br>Number of features seen during :term:`fit`. Only defined if the<br>underlying transformers expose such an attribute when fit.<br><br>.. versionadded:: 0.24</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">int</td>
+           <td>2</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-named_transformers_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=named_transformers_,-%3Aclass%3A~sklearn.utils.Bunch">
+            named_transformers_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-named_transformers_;">
+            named_transformers_: :class:`~sklearn.utils.Bunch`<br><br>Read-only attribute to access any transformer by given name.<br>Keys are transformer names and values are the fitted transformer<br>objects.</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">Bunch</td>
+           <td>{&#x27;cat&#x27;: OneHo...&#x27;one-to-one&#x27;)}</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-output_indices_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=output_indices_,-dict">
+            output_indices_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-output_indices_;">
+            output_indices_: dict<br><br>A dictionary from each transformer name to a slice, where the slice<br>corresponds to indices in the transformed output. This is useful to<br>inspect which transformer is responsible for which transformed<br>feature(s).<br><br>.. versionadded:: 1.0</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">dict</td>
+           <td>{&#x27;cat&#x27;: slice(0, 16, None), &#x27;num&#x27;: slice(16, 17, None), &#x27;re...er&#x27;: slice(0, 0, None)}</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-sparse_output_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=sparse_output_,-bool">
+            sparse_output_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-sparse_output_;">
+            sparse_output_: bool<br><br>Boolean flag indicating whether the output of ``transform`` is a<br>sparse matrix or a dense numpy array, which depends on the output<br>of the individual transformers and the `sparse_threshold` keyword.</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">bool</td>
+           <td>True</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-transformers_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=transformers_,-list">
+            transformers_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-transformers_;">
+            transformers_: list<br><br>The collection of fitted transformers as tuples of (name,<br>fitted_transformer, column). `fitted_transformer` can be an estimator,<br>or `&#x27;drop&#x27;`; `&#x27;passthrough&#x27;` is replaced with an equivalent<br>:class:`~sklearn.preprocessing.FunctionTransformer`. In case there were<br>no columns selected, this will be the unfitted transformer. If there<br>are remaining columns, the final element is a tuple of the form:<br>(&#x27;remainder&#x27;, transformer, remaining_columns) corresponding to the<br>``remainder`` parameter. If there are remaining columns, then<br>``len(transformers_)==len(transformers)+1``, otherwise<br>``len(transformers_)==len(transformers)``.<br><br>.. versionadded:: 1.7<br>    The format of the remaining columns now attempts to match that of the other<br>    transformers: if all columns were provided as column names (`str`), the<br>    remaining columns are stored as column names; if all columns were provided<br>    as mask arrays (`bool`), so are the remaining columns; in all other cases<br>    the remaining columns are stored as indices (`int`).</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">list</td>
+           <td>[(&#x27;cat&#x27;, OneHotEncoder...nown=&#x27;ignore&#x27;), [&#x27;Di...on&#x27;]), (&#x27;num&#x27;, FunctionTrans...=&#x27;one-to-one&#x27;), [&#x27;Speed&#x27;])]</td>
+
+
+       </tr>
+    
+                    </tbody>
+                </table>
+            </details>
+        </div>
+    </div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually sk-global" id="sk-estimator-id-69" type="checkbox" ><label for="sk-estimator-id-69" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>cat</div></div></label><div class="sk-toggleable__content fitted" data-param-prefix="prep__cat__"><pre>[&#x27;Direction&#x27;]</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually sk-global" id="sk-estimator-id-70" type="checkbox" ><label for="sk-estimator-id-70" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>OneHotEncoder</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.preprocessing.OneHotEncoder.html">?<span>Documentation for OneHotEncoder</span></a></div></label><div class="sk-toggleable__content fitted" data-param-prefix="prep__cat__">
+        <div class="estimator-table">
+            <details>
+                <summary>Parameters</summary>
+                <table class="parameters-table">
+                  <tbody>
+                    
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy handle_unknown to clipboard"
+                 onclick="copyToClipboard('handle_unknown',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-handle_unknown;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.preprocessing.OneHotEncoder.html#:~:text=handle_unknown,-%7B%27error%27%2C%20%27ignore%27%2C%20%27infrequent_if_exist%27%2C%20%27warn%27%7D%2C%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20default%3D%27error%27">
+            handle_unknown
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-handle_unknown;">
+            handle_unknown: {&#x27;error&#x27;, &#x27;ignore&#x27;, &#x27;infrequent_if_exist&#x27;, &#x27;warn&#x27;},                      default=&#x27;error&#x27;<br><br>Specifies the way unknown categories are handled during :meth:`transform`.<br><br>- &#x27;error&#x27; : Raise an error if an unknown category is present during transform.<br>- &#x27;ignore&#x27; : When an unknown category is encountered during<br>  transform, the resulting one-hot encoded columns for this feature<br>  will be all zeros. In the inverse transform, an unknown category<br>  will be denoted as None.<br>- &#x27;infrequent_if_exist&#x27; : When an unknown category is encountered<br>  during transform, the resulting one-hot encoded columns for this<br>  feature will map to the infrequent category if it exists. The<br>  infrequent category will be mapped to the last position in the<br>  encoding. During inverse transform, an unknown category will be<br>  mapped to the category denoted `&#x27;infrequent&#x27;` if it exists. If the<br>  `&#x27;infrequent&#x27;` category does not exist, then :meth:`transform` and<br>  :meth:`inverse_transform` will handle an unknown category as with<br>  `handle_unknown=&#x27;ignore&#x27;`. Infrequent categories exist based on<br>  `min_frequency` and `max_categories`. Read more in the<br>  :ref:`User Guide &lt;encoder_infrequent_categories&gt;`.<br>- &#x27;warn&#x27; : When an unknown category is encountered during transform<br>  a warning is issued, and the encoding then proceeds as described for<br>  `handle_unknown=&quot;infrequent_if_exist&quot;`.<br><br>.. versionchanged:: 1.1<br>    `&#x27;infrequent_if_exist&#x27;` was added to automatically handle unknown<br>    categories and infrequent categories.<br><br>.. versionadded:: 1.6<br>   The option `&quot;warn&quot;` was added in 1.6.</span>
+        </a>
+    </td>
+            <td class="value">&#x27;ignore&#x27;</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy categories to clipboard"
+                 onclick="copyToClipboard('categories',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-categories;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.preprocessing.OneHotEncoder.html#:~:text=categories,-%27auto%27%20or%20a%20list%20of%20array-like%2C%20default%3D%27auto%27">
+            categories
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-categories;">
+            categories: &#x27;auto&#x27; or a list of array-like, default=&#x27;auto&#x27;<br><br>Categories (unique values) per feature:<br><br>- &#x27;auto&#x27; : Determine categories automatically from the training data.<br>- list : ``categories[i]`` holds the categories expected in the ith<br>  column. The passed categories should not mix strings and numeric<br>  values within a single feature, and should be sorted in case of<br>  numeric values.<br><br>The used categories can be found in the ``categories_`` attribute.<br><br>.. versionadded:: 0.20</span>
+        </a>
+    </td>
+            <td class="value">&#x27;auto&#x27;</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy drop to clipboard"
+                 onclick="copyToClipboard('drop',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-drop;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.preprocessing.OneHotEncoder.html#:~:text=drop,-%7B%27first%27%2C%20%27if_binary%27%7D%20or%20an%20array-like%20of%20shape%20%28n_features%2C%29%2C%20%20%20%20%20%20%20%20%20%20%20%20%20default%3DNone">
+            drop
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-drop;">
+            drop: {&#x27;first&#x27;, &#x27;if_binary&#x27;} or an array-like of shape (n_features,),             default=None<br><br>Specifies a methodology to use to drop one of the categories per<br>feature. This is useful in situations where perfectly collinear<br>features cause problems, such as when feeding the resulting data<br>into an unregularized linear regression model.<br><br>However, dropping one category breaks the symmetry of the original<br>representation and can therefore induce a bias in downstream models,<br>for instance for penalized linear classification or regression models.<br><br>- None : retain all features (the default).<br>- &#x27;first&#x27; : drop the first category in each feature. If only one<br>  category is present, the feature will be dropped entirely.<br>- &#x27;if_binary&#x27; : drop the first category in each feature with two<br>  categories. Features with 1 or more than 2 categories are<br>  left intact.<br>- array : ``drop[i]`` is the category in feature ``X[:, i]`` that<br>  should be dropped.<br><br>When `max_categories` or `min_frequency` is configured to group<br>infrequent categories, the dropping behavior is handled after the<br>grouping.<br><br>.. versionadded:: 0.21<br>   The parameter `drop` was added in 0.21.<br><br>.. versionchanged:: 0.23<br>   The option `drop=&#x27;if_binary&#x27;` was added in 0.23.<br><br>.. versionchanged:: 1.1<br>    Support for dropping infrequent categories.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy sparse_output to clipboard"
+                 onclick="copyToClipboard('sparse_output',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-sparse_output;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.preprocessing.OneHotEncoder.html#:~:text=sparse_output,-bool%2C%20default%3DTrue">
+            sparse_output
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-sparse_output;">
+            sparse_output: bool, default=True<br><br>When ``True``, it returns a SciPy sparse matrix/array<br>in &quot;Compressed Sparse Row&quot; (CSR) format.<br><br>.. versionadded:: 1.2<br>   `sparse` was renamed to `sparse_output`</span>
+        </a>
+    </td>
+            <td class="value">True</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy dtype to clipboard"
+                 onclick="copyToClipboard('dtype',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-dtype;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.preprocessing.OneHotEncoder.html#:~:text=dtype,-number%20type%2C%20default%3Dnp.float64">
+            dtype
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-dtype;">
+            dtype: number type, default=np.float64<br><br>Desired dtype of output.</span>
+        </a>
+    </td>
+            <td class="value">&lt;class &#x27;numpy.float64&#x27;&gt;</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy min_frequency to clipboard"
+                 onclick="copyToClipboard('min_frequency',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-min_frequency;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.preprocessing.OneHotEncoder.html#:~:text=min_frequency,-int%20or%20float%2C%20default%3DNone">
+            min_frequency
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-min_frequency;">
+            min_frequency: int or float, default=None<br><br>Specifies the minimum frequency below which a category will be<br>considered infrequent.<br><br>- If `int`, categories with a smaller cardinality will be considered<br>  infrequent.<br><br>- If `float`, categories with a smaller cardinality than<br>  `min_frequency * n_samples`  will be considered infrequent.<br><br>.. versionadded:: 1.1<br>    Read more in the :ref:`User Guide &lt;encoder_infrequent_categories&gt;`.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy max_categories to clipboard"
+                 onclick="copyToClipboard('max_categories',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-max_categories;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.preprocessing.OneHotEncoder.html#:~:text=max_categories,-int%2C%20default%3DNone">
+            max_categories
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-max_categories;">
+            max_categories: int, default=None<br><br>Specifies an upper limit to the number of output features for each input<br>feature when considering infrequent categories. If there are infrequent<br>categories, `max_categories` includes the category representing the<br>infrequent categories along with the frequent categories. If `None`,<br>there is no limit to the number of output features.<br><br>.. versionadded:: 1.1<br>    Read more in the :ref:`User Guide &lt;encoder_infrequent_categories&gt;`.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy feature_name_combiner to clipboard"
+                 onclick="copyToClipboard('feature_name_combiner',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-feature_name_combiner;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.preprocessing.OneHotEncoder.html#:~:text=feature_name_combiner,-%22concat%22%20or%20callable%2C%20default%3D%22concat%22">
+            feature_name_combiner
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-feature_name_combiner;">
+            feature_name_combiner: &quot;concat&quot; or callable, default=&quot;concat&quot;<br><br>Callable with signature `def callable(input_feature, category)` that returns a<br>string. This is used to create feature names to be returned by<br>:meth:`get_feature_names_out`.<br><br>`&quot;concat&quot;` concatenates encoded feature name and category with<br>`feature + &quot;_&quot; + str(category)`.E.g. feature X with values 1, 6, 7 create<br>feature names `X_1, X_6, X_7`.<br><br>.. versionadded:: 1.3</span>
+        </a>
+    </td>
+            <td class="value">&#x27;concat&#x27;</td>
+        </tr>
+    
+                  </tbody>
+                </table>
+            </details>
+        </div>
+    
+        <div class="estimator-table">
+            <details>
+                <summary>Fitted attributes</summary>
+                <table class="parameters-table">
+                    <tbody>
+                        <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Value</th>
+                        </tr>
+                        
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-categories_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.preprocessing.OneHotEncoder.html#:~:text=categories_,-list%20of%20arrays">
+            categories_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-categories_;">
+            categories_: list of arrays<br><br>The categories of each feature determined during fitting<br>(in order of the features in X and corresponding with the output<br>of ``transform``). This includes the category specified in ``drop``<br>(if any).</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">list</td>
+           <td>[array([&#x27;E&#x27;, &#x27;... dtype=object)]</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-drop_idx_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.preprocessing.OneHotEncoder.html#:~:text=drop_idx_,-array%20of%20shape%20%28n_features%2C%29">
+            drop_idx_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-drop_idx_;">
+            drop_idx_: array of shape (n_features,)<br><br>- ``drop_idx_[i]`` is the index in ``categories_[i]`` of the category<br>  to be dropped for each feature.<br>- ``drop_idx_[i] = None`` if no category is to be dropped from the<br>  feature with index ``i``, e.g. when `drop=&#x27;if_binary&#x27;` and the<br>  feature isn&#x27;t binary.<br>- ``drop_idx_ = None`` if all the transformed features will be<br>  retained.<br><br>If infrequent categories are enabled by setting `min_frequency` or<br>`max_categories` to a non-default value and `drop_idx[i]` corresponds<br>to an infrequent category, then the entire infrequent category is<br>dropped.<br><br>.. versionchanged:: 0.23<br>   Added the possibility to contain `None` values.</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">NoneType</td>
+           <td>None</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-feature_names_in_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.preprocessing.OneHotEncoder.html#:~:text=feature_names_in_,-ndarray%20of%20shape%20%28n_features_in_%2C%29">
+            feature_names_in_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-feature_names_in_;">
+            feature_names_in_: ndarray of shape (`n_features_in_`,)<br><br>Names of features seen during :term:`fit`. Defined only when `X`<br>has feature names that are all strings.<br><br>.. versionadded:: 1.0</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">ndarray[object](1,)</td>
+           <td>[&#x27;Direction&#x27;]</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-n_features_in_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.preprocessing.OneHotEncoder.html#:~:text=n_features_in_,-int">
+            n_features_in_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-n_features_in_;">
+            n_features_in_: int<br><br>Number of features seen during :term:`fit`.<br><br>.. versionadded:: 1.0</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">int</td>
+           <td>1</td>
+
+
+       </tr>
+    
+                    </tbody>
+                </table>
+            </details>
+        </div>
+    </div></div></div>
+        <div class="features fitted">
+          <details>
+            <summary>
+              <div class="arrow"></div>
+              <div>16 features</div>
+              <div class="image-container">
+                <button type="button" class="copy-paste-icon"
+                  title="Copy output features (max 100)"
+                  aria-label="Copy output features (max 100)"
+                  onclick="
+                  event.stopPropagation();
+                  event.preventDefault();
+                  copyFeatureNamesToClipboard(this);
+                  "
+                >
+                </button>
+              </div>
+            </summary>
+            <div class="features-container">
+                <table class="features-table">
+                  <tbody>
+                    
+        <tr>
+          <td>Direction_E</td>
+        </tr>
+
+    
+        <tr>
+          <td>Direction_ENE</td>
+        </tr>
+
+    
+        <tr>
+          <td>Direction_ESE</td>
+        </tr>
+
+    
+        <tr>
+          <td>Direction_N</td>
+        </tr>
+
+    
+        <tr>
+          <td>Direction_NE</td>
+        </tr>
+
+    
+        <tr>
+          <td>Direction_NNE</td>
+        </tr>
+
+    
+        <tr>
+          <td>Direction_NNW</td>
+        </tr>
+
+    
+        <tr>
+          <td>Direction_NW</td>
+        </tr>
+
+    
+        <tr>
+          <td>Direction_S</td>
+        </tr>
+
+    
+        <tr>
+          <td>Direction_SE</td>
+        </tr>
+
+    
+        <tr>
+          <td>Direction_SSE</td>
+        </tr>
+
+    
+        <tr>
+          <td>Direction_SSW</td>
+        </tr>
+
+    
+        <tr>
+          <td>Direction_SW</td>
+        </tr>
+
+    
+        <tr>
+          <td>Direction_W</td>
+        </tr>
+
+    
+        <tr>
+          <td>Direction_WNW</td>
+        </tr>
+
+    
+        <tr>
+          <td>Direction_WSW</td>
+        </tr>
+
+    
+                  </tbody>
+                </table>
+            </div>
+          </details>
+        </div>
+    </div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually sk-global" id="sk-estimator-id-71" type="checkbox" ><label for="sk-estimator-id-71" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>num</div></div></label><div class="sk-toggleable__content fitted" data-param-prefix="prep__num__"><pre>[&#x27;Speed&#x27;]</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually sk-global" id="sk-estimator-id-72" type="checkbox" ><label for="sk-estimator-id-72" class="sk-toggleable__label fitted "><div><div>passthrough</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.preprocessing.FunctionTransformer.html">?<span>Documentation for FunctionTransformer</span></a></div></label><div class="sk-toggleable__content fitted" data-param-prefix="prep__num__"><pre></pre></div></div></div>
+        <div class="features fitted">
+          <details>
+            <summary>
+              <div class="arrow"></div>
+              <div>1 feature</div>
+              <div class="image-container">
+                <button type="button" class="copy-paste-icon"
+                  title="Copy output features (max 100)"
+                  aria-label="Copy output features (max 100)"
+                  onclick="
+                  event.stopPropagation();
+                  event.preventDefault();
+                  copyFeatureNamesToClipboard(this);
+                  "
+                >
+                </button>
+              </div>
+            </summary>
+            <div class="features-container">
+                <table class="features-table">
+                  <tbody>
+                    
+        <tr>
+          <td>Speed</td>
+        </tr>
+
+    
+                  </tbody>
+                </table>
+            </div>
+          </details>
+        </div>
+    </div></div></div></div><div class='total_features'>
+        <div class="features fitted">
+          <details>
+            <summary>
+              <div class="arrow"></div>
+              <div>17 features</div>
+              <div class="image-container">
+                <button type="button" class="copy-paste-icon"
+                  title="Copy output features (max 100)"
+                  aria-label="Copy output features (max 100)"
+                  onclick="
+                  event.stopPropagation();
+                  event.preventDefault();
+                  copyFeatureNamesToClipboard(this);
+                  "
+                >
+                </button>
+              </div>
+            </summary>
+            <div class="features-container">
+                <table class="features-table">
+                  <tbody>
+                    
+        <tr>
+          <td>cat__Direction_E</td>
+        </tr>
+
+    
+        <tr>
+          <td>cat__Direction_ENE</td>
+        </tr>
+
+    
+        <tr>
+          <td>cat__Direction_ESE</td>
+        </tr>
+
+    
+        <tr>
+          <td>cat__Direction_N</td>
+        </tr>
+
+    
+        <tr>
+          <td>cat__Direction_NE</td>
+        </tr>
+
+    
+        <tr>
+          <td>cat__Direction_NNE</td>
+        </tr>
+
+    
+        <tr>
+          <td>cat__Direction_NNW</td>
+        </tr>
+
+    
+        <tr>
+          <td>cat__Direction_NW</td>
+        </tr>
+
+    
+        <tr>
+          <td>cat__Direction_S</td>
+        </tr>
+
+    
+        <tr>
+          <td>cat__Direction_SE</td>
+        </tr>
+
+    
+        <tr>
+          <td>cat__Direction_SSE</td>
+        </tr>
+
+    
+        <tr>
+          <td>cat__Direction_SSW</td>
+        </tr>
+
+    
+        <tr>
+          <td>cat__Direction_SW</td>
+        </tr>
+
+    
+        <tr>
+          <td>cat__Direction_W</td>
+        </tr>
+
+    
+        <tr>
+          <td>cat__Direction_WNW</td>
+        </tr>
+
+    
+        <tr>
+          <td>cat__Direction_WSW</td>
+        </tr>
+
+    
+        <tr>
+          <td>num__Speed</td>
+        </tr>
+
+    
+                  </tbody>
+                </table>
+            </div>
+          </details>
+        </div>
+    </div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually sk-global" id="sk-estimator-id-73" type="checkbox" ><label for="sk-estimator-id-73" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>XGBRegressor</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor">?<span>Documentation for XGBRegressor</span></a></div></label><div class="sk-toggleable__content fitted" data-param-prefix="reg__">
+        <div class="estimator-table">
+            <details>
+                <summary>Parameters</summary>
+                <table class="parameters-table">
+                  <tbody>
+                    
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy base_score to clipboard"
+                 onclick="copyToClipboard('base_score',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-base_score;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=base_score,-float%20%7C%20typing.List%5Bfloat%5D%20%7C%20None">
+            base_score
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-base_score;">
+            base_score: float | typing.List[float] | None<br><br>The initial prediction score of all instances, global bias.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy booster to clipboard"
+                 onclick="copyToClipboard('booster',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">booster</td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy callbacks to clipboard"
+                 onclick="copyToClipboard('callbacks',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-callbacks;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=callbacks,-typing.List%5Bxgboost.callback.TrainingCallback%5D%20%7C%20None">
+            callbacks
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-callbacks;">
+            callbacks: typing.List[xgboost.callback.TrainingCallback] | None<br><br>List of callback functions that are applied at end of each iteration.<br>It is possible to use predefined callbacks by using<br>:ref:`Callback API &lt;callback_api&gt;`.<br><br>.. note::<br><br>   States in callback are not preserved during training, which means callback<br>   objects can not be reused for multiple training sessions without<br>   reinitialization or deepcopy.<br><br>.. code-block:: python<br><br>    for params in parameters_grid:<br>        # be sure to (re)initialize the callbacks before each run<br>        callbacks = [xgb.callback.LearningRateScheduler(custom_rates)]<br>        reg = xgboost.XGBRegressor(**params, callbacks=callbacks)<br>        reg.fit(X, y)</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy colsample_bylevel to clipboard"
+                 onclick="copyToClipboard('colsample_bylevel',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-colsample_bylevel;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=colsample_bylevel,-float%20%7C%20None">
+            colsample_bylevel
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-colsample_bylevel;">
+            colsample_bylevel: float | None<br><br>Subsample ratio of columns for each level.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy colsample_bynode to clipboard"
+                 onclick="copyToClipboard('colsample_bynode',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-colsample_bynode;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=colsample_bynode,-float%20%7C%20None">
+            colsample_bynode
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-colsample_bynode;">
+            colsample_bynode: float | None<br><br>Subsample ratio of columns for each split.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy colsample_bytree to clipboard"
+                 onclick="copyToClipboard('colsample_bytree',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-colsample_bytree;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=colsample_bytree,-float%20%7C%20None">
+            colsample_bytree
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-colsample_bytree;">
+            colsample_bytree: float | None<br><br>Subsample ratio of columns when constructing each tree.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy device to clipboard"
+                 onclick="copyToClipboard('device',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-device;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=device,-str%20%7C%20None">
+            device
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-device;">
+            device: str | None<br><br>.. versionadded:: 2.0.0<br><br>Device ordinal, available options are `cpu`, `cuda`, and `gpu`.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy early_stopping_rounds to clipboard"
+                 onclick="copyToClipboard('early_stopping_rounds',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-early_stopping_rounds;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=early_stopping_rounds,-int%20%7C%20None">
+            early_stopping_rounds
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-early_stopping_rounds;">
+            early_stopping_rounds: int | None<br><br>.. versionadded:: 1.6.0<br><br>- Activates early stopping. Validation metric needs to improve at least once in<br>  every **early_stopping_rounds** round(s) to continue training.  Requires at<br>  least one item in **eval_set** in :py:meth:`fit`.<br><br>- If early stopping occurs, the model will have two additional attributes:<br>  :py:attr:`best_score` and :py:attr:`best_iteration`. These are used by the<br>  :py:meth:`predict` and :py:meth:`apply` methods to determine the optimal<br>  number of trees during inference. If users want to access the full model<br>  (including trees built after early stopping), they can specify the<br>  `iteration_range` in these inference methods. In addition, other utilities<br>  like model plotting can also use the entire model.<br><br>- If you prefer to discard the trees after `best_iteration`, consider using the<br>  callback function :py:class:`xgboost.callback.EarlyStopping`.<br><br>- If there&#x27;s more than one item in **eval_set**, the last entry will be used for<br>  early stopping.  If there&#x27;s more than one metric in **eval_metric**, the last<br>  metric will be used for early stopping.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy enable_categorical to clipboard"
+                 onclick="copyToClipboard('enable_categorical',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-enable_categorical;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=enable_categorical,-bool">
+            enable_categorical
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-enable_categorical;">
+            enable_categorical: bool<br><br>See the same parameter of :py:class:`DMatrix` for details.</span>
+        </a>
+    </td>
+            <td class="value">True</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy eval_metric to clipboard"
+                 onclick="copyToClipboard('eval_metric',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-eval_metric;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=eval_metric,-str%20%7C%20typing.List%5Bstr%20%7C%20typing.Callable%5D%20%7C%20typing.Callable%20%7C%20None">
+            eval_metric
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-eval_metric;">
+            eval_metric: str | typing.List[str | typing.Callable] | typing.Callable | None<br><br>.. versionadded:: 1.6.0<br><br>Metric used for monitoring the training result and early stopping.  It can be a<br>string or list of strings as names of predefined metric in XGBoost (See<br>:doc:`/parameter`), one of the metrics in :py:mod:`sklearn.metrics`, or any<br>other user defined metric that looks like `sklearn.metrics`.<br><br>If custom objective is also provided, then custom metric should implement the<br>corresponding reverse link function.<br><br>Unlike the `scoring` parameter commonly used in scikit-learn, when a callable<br>object is provided, it&#x27;s assumed to be a cost function and by default XGBoost<br>will minimize the result during early stopping.<br><br>For advanced usage on Early stopping like directly choosing to maximize instead<br>of minimize, see :py:obj:`xgboost.callback.EarlyStopping`.<br><br>See :doc:`/tutorials/custom_metric_obj` and :ref:`custom-obj-metric` for more<br>information.<br><br>.. code-block:: python<br><br>    from sklearn.datasets import load_diabetes<br>    from sklearn.metrics import mean_absolute_error<br>    X, y = load_diabetes(return_X_y=True)<br>    reg = xgb.XGBRegressor(<br>        tree_method=&quot;hist&quot;,<br>        eval_metric=mean_absolute_error,<br>    )<br>    reg.fit(X, y, eval_set=[(X, y)])</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy feature_types to clipboard"
+                 onclick="copyToClipboard('feature_types',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-feature_types;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=feature_types,-typing.Sequence%5Bstr%5D%20%7C%20None">
+            feature_types
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-feature_types;">
+            feature_types: typing.Sequence[str] | None<br><br>.. versionadded:: 1.7.0<br><br>Used for specifying feature types without constructing a dataframe. See<br>the :py:class:`DMatrix` for details.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy feature_weights to clipboard"
+                 onclick="copyToClipboard('feature_weights',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-feature_weights;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=feature_weights,-Optional%5BArrayLike%5D">
+            feature_weights
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-feature_weights;">
+            feature_weights: Optional[ArrayLike]<br><br>Weight for each feature, defines the probability of each feature being selected<br>when colsample is being used.  All values must be greater than 0, otherwise a<br>`ValueError` is thrown.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy gamma to clipboard"
+                 onclick="copyToClipboard('gamma',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-gamma;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=gamma,-float%20%7C%20None">
+            gamma
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-gamma;">
+            gamma: float | None<br><br>(min_split_loss) Minimum loss reduction required to make a further partition on<br>a leaf node of the tree.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy grow_policy to clipboard"
+                 onclick="copyToClipboard('grow_policy',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-grow_policy;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=grow_policy,-str%20%7C%20None">
+            grow_policy
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-grow_policy;">
+            grow_policy: str | None<br><br>Tree growing policy.<br><br>- depthwise: Favors splitting at nodes closest to the node,<br>- lossguide: Favors splitting at nodes with highest loss change.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy importance_type to clipboard"
+                 onclick="copyToClipboard('importance_type',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">importance_type</td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy interaction_constraints to clipboard"
+                 onclick="copyToClipboard('interaction_constraints',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-interaction_constraints;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=interaction_constraints,-str%20%7C%20typing.List%5Btyping.Tuple%5Bstr%5D%5D%20%7C%20None">
+            interaction_constraints
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-interaction_constraints;">
+            interaction_constraints: str | typing.List[typing.Tuple[str]] | None<br><br>Constraints for interaction representing permitted interactions.  The<br>constraints must be specified in the form of a nested list, e.g. ``[[0, 1], [2,<br>3, 4]]``, where each inner list is a group of indices of features that are<br>allowed to interact with each other.  See :doc:`tutorial<br>&lt;/tutorials/feature_interaction_constraint&gt;` for more information</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy learning_rate to clipboard"
+                 onclick="copyToClipboard('learning_rate',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-learning_rate;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=learning_rate,-float%20%7C%20None">
+            learning_rate
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-learning_rate;">
+            learning_rate: float | None<br><br>Boosting learning rate (xgb&#x27;s &quot;eta&quot;)</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy max_bin to clipboard"
+                 onclick="copyToClipboard('max_bin',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-max_bin;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=max_bin,-int%20%7C%20None">
+            max_bin
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-max_bin;">
+            max_bin: int | None<br><br>If using histogram-based algorithm, maximum number of bins per feature</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy max_cat_threshold to clipboard"
+                 onclick="copyToClipboard('max_cat_threshold',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-max_cat_threshold;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=max_cat_threshold,-int%20%7C%20None">
+            max_cat_threshold
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-max_cat_threshold;">
+            max_cat_threshold: int | None<br><br>.. versionadded:: 1.7.0<br><br>.. note:: This parameter is experimental<br><br>Maximum number of categories considered for each split. Used only by<br>partition-based splits for preventing over-fitting. Also, `enable_categorical`<br>needs to be set to have categorical feature support. See :doc:`Categorical Data<br>&lt;/tutorials/categorical&gt;` and :ref:`cat-param` for details.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy max_cat_to_onehot to clipboard"
+                 onclick="copyToClipboard('max_cat_to_onehot',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-max_cat_to_onehot;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=max_cat_to_onehot,-Optional%5Bint%5D">
+            max_cat_to_onehot
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-max_cat_to_onehot;">
+            max_cat_to_onehot: Optional[int]<br><br>.. versionadded:: 1.6.0<br><br>.. note:: This parameter is experimental<br><br>A threshold for deciding whether XGBoost should use one-hot encoding based split<br>for categorical data.  When number of categories is lesser than the threshold<br>then one-hot encoding is chosen, otherwise the categories will be partitioned<br>into children nodes. Also, `enable_categorical` needs to be set to have<br>categorical feature support. See :doc:`Categorical Data<br>&lt;/tutorials/categorical&gt;` and :ref:`cat-param` for details.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy max_delta_step to clipboard"
+                 onclick="copyToClipboard('max_delta_step',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-max_delta_step;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=max_delta_step,-float%20%7C%20None">
+            max_delta_step
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-max_delta_step;">
+            max_delta_step: float | None<br><br>Maximum delta step we allow each tree&#x27;s weight estimation to be.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy max_depth to clipboard"
+                 onclick="copyToClipboard('max_depth',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-max_depth;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=max_depth,-%20int%20%7C%20None">
+            max_depth
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-max_depth;">
+            max_depth:  int | None<br><br>Maximum tree depth for base learners.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy max_leaves to clipboard"
+                 onclick="copyToClipboard('max_leaves',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-max_leaves;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=max_leaves,-int%20%7C%20None">
+            max_leaves
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-max_leaves;">
+            max_leaves: int | None<br><br>Maximum number of leaves; 0 indicates no limit.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy min_child_weight to clipboard"
+                 onclick="copyToClipboard('min_child_weight',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-min_child_weight;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=min_child_weight,-float%20%7C%20None">
+            min_child_weight
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-min_child_weight;">
+            min_child_weight: float | None<br><br>Minimum sum of instance weight(hessian) needed in a child.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy missing to clipboard"
+                 onclick="copyToClipboard('missing',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-missing;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=missing,-float">
+            missing
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-missing;">
+            missing: float<br><br>Value in the data which needs to be present as a missing value. Default to<br>:py:data:`numpy.nan`.</span>
+        </a>
+    </td>
+            <td class="value">nan</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy monotone_constraints to clipboard"
+                 onclick="copyToClipboard('monotone_constraints',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-monotone_constraints;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=monotone_constraints,-typing.Dict%5Bstr%2C%20int%5D%20%7C%20str%20%7C%20None">
+            monotone_constraints
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-monotone_constraints;">
+            monotone_constraints: typing.Dict[str, int] | str | None<br><br>Constraint of variable monotonicity.  See :doc:`tutorial &lt;/tutorials/monotonic&gt;`<br>for more information.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy multi_strategy to clipboard"
+                 onclick="copyToClipboard('multi_strategy',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-multi_strategy;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=multi_strategy,-str%20%7C%20None">
+            multi_strategy
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-multi_strategy;">
+            multi_strategy: str | None<br><br>.. versionadded:: 2.0.0<br><br>.. note:: This parameter is working-in-progress.<br><br>The strategy used for training multi-target models, including multi-target<br>regression and multi-class classification. See :doc:`/tutorials/multioutput` for<br>more information.<br><br>- ``one_output_per_tree``: One model for each target.<br>- ``multi_output_tree``:  Use multi-target trees.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy n_estimators to clipboard"
+                 onclick="copyToClipboard('n_estimators',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-n_estimators;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=n_estimators,-int%20%7C%20None">
+            n_estimators
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-n_estimators;">
+            n_estimators: int | None<br><br>Number of gradient boosted trees.  Equivalent to number of boosting<br>rounds.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy n_jobs to clipboard"
+                 onclick="copyToClipboard('n_jobs',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-n_jobs;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=n_jobs,-int%20%7C%20None">
+            n_jobs
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-n_jobs;">
+            n_jobs: int | None<br><br>Number of parallel threads used to run xgboost.  When used with other<br>Scikit-Learn algorithms like grid search, you may choose which algorithm to<br>parallelize and balance the threads.  Creating thread contention will<br>significantly slow down both algorithms.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy num_parallel_tree to clipboard"
+                 onclick="copyToClipboard('num_parallel_tree',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">num_parallel_tree</td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy random_state to clipboard"
+                 onclick="copyToClipboard('random_state',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-random_state;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=random_state,-numpy.random.mtrand.RandomState%20%7C%20numpy.random._generator.Generator%20%7C%20int%20%7C%20None">
+            random_state
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-random_state;">
+            random_state: numpy.random.mtrand.RandomState | numpy.random._generator.Generator | int | None<br><br>Random number seed.<br><br>.. note::<br><br>   Using gblinear booster with shotgun updater is nondeterministic as<br>   it uses Hogwild algorithm.</span>
+        </a>
+    </td>
+            <td class="value">42</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy reg_alpha to clipboard"
+                 onclick="copyToClipboard('reg_alpha',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-reg_alpha;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=reg_alpha,-float%20%7C%20None">
+            reg_alpha
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-reg_alpha;">
+            reg_alpha: float | None<br><br>L1 regularization term on weights (xgb&#x27;s alpha).</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy reg_lambda to clipboard"
+                 onclick="copyToClipboard('reg_lambda',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-reg_lambda;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=reg_lambda,-float%20%7C%20None">
+            reg_lambda
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-reg_lambda;">
+            reg_lambda: float | None<br><br>L2 regularization term on weights (xgb&#x27;s lambda).</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy sampling_method to clipboard"
+                 onclick="copyToClipboard('sampling_method',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-sampling_method;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=sampling_method,-str%20%7C%20None">
+            sampling_method
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-sampling_method;">
+            sampling_method: str | None<br><br>Sampling method. Used only by the GPU version of ``hist`` tree method.<br><br>- ``uniform``: Select random training instances uniformly.<br>- ``gradient_based``: Select random training instances with higher probability<br>    when the gradient and hessian are larger. (cf. CatBoost)</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy scale_pos_weight to clipboard"
+                 onclick="copyToClipboard('scale_pos_weight',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-scale_pos_weight;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=scale_pos_weight,-float%20%7C%20None">
+            scale_pos_weight
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-scale_pos_weight;">
+            scale_pos_weight: float | None<br><br>Balancing of positive and negative weights.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy subsample to clipboard"
+                 onclick="copyToClipboard('subsample',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-subsample;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=subsample,-float%20%7C%20None">
+            subsample
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-subsample;">
+            subsample: float | None<br><br>Subsample ratio of the training instance.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy tree_method to clipboard"
+                 onclick="copyToClipboard('tree_method',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-tree_method;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=tree_method,-str%20%7C%20None">
+            tree_method
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-tree_method;">
+            tree_method: str | None<br><br>Specify which tree method to use.  Default to auto.  If this parameter is set to<br>default, XGBoost will choose the most conservative option available.  It&#x27;s<br>recommended to study this option from the parameters document :doc:`tree method<br>&lt;/treemethod&gt;`</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy validate_parameters to clipboard"
+                 onclick="copyToClipboard('validate_parameters',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-validate_parameters;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=validate_parameters,-bool%20%7C%20None">
+            validate_parameters
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-validate_parameters;">
+            validate_parameters: bool | None<br><br>Give warnings for unknown parameter.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy verbosity to clipboard"
+                 onclick="copyToClipboard('verbosity',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-verbosity;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=verbosity,-int%20%7C%20None">
+            verbosity
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-verbosity;">
+            verbosity: int | None<br><br>The degree of verbosity. Valid values are 0 (silent) - 3 (debug).</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy objective to clipboard"
+                 onclick="copyToClipboard('objective',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-objective;"
+            rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.4.0/python/python_api.html#xgboost.XGBRegressor#:~:text=objective,-str%20%7C%20xgboost.objective.Objective%20%7C%20xgboost.sklearn._SklObjWProto%20%7C%20typing.Callable%5B%5Btyping.Any%2C%20typing.Any%5D%2C%20typing.Tuple%5Bnumpy.ndarray%2C%20numpy.ndarray%5D%5D%20%7C%20None">
+            objective
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-objective;">
+            objective: str | xgboost.objective.Objective | xgboost.sklearn._SklObjWProto | typing.Callable[[typing.Any, typing.Any], typing.Tuple[numpy.ndarray, numpy.ndarray]] | None<br><br>Specify the learning task and the corresponding learning objective or a custom<br>objective to be used.<br><br>For custom objective, see :doc:`/tutorials/custom_metric_obj` and<br>:ref:`custom-obj-metric` for more information, along with the end note for<br>function signatures.</span>
+        </a>
+    </td>
+            <td class="value">&#x27;reg:squarederror&#x27;</td>
+        </tr>
+    
+                  </tbody>
+                </table>
+            </details>
+        </div>
+    
+        <div class="estimator-table">
+            <details>
+                <summary>Fitted attributes</summary>
+                <table class="parameters-table">
+                    <tbody>
+                        <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Value</th>
+                        </tr>
+                        
+       <tr class="default">
+           <td class="param"><a class="param-doc-link" style="text-decoration:none;">feature_importances_</a></td>
+           <td class="fitted-att-type">ndarray[float32](17,)</td>
+           <td>[0.02,0.01,0.04,...,0.02,0.04,0.27]</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param"><a class="param-doc-link" style="text-decoration:none;">intercept_</a></td>
+           <td class="fitted-att-type">ndarray[float32](1,)</td>
+           <td>[22.16]</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param"><a class="param-doc-link" style="text-decoration:none;">n_features_in_</a></td>
+           <td class="fitted-att-type">int</td>
+           <td>17</td>
+
+
+       </tr>
+    
+                    </tbody>
+                </table>
+            </details>
+        </div>
+    </div></div></div></div></div></div></div><script>/*  Authors: The scikit-learn developers
+ SPDX-License-Identifier: BSD-3-Clause
+*/
+
+function copyToClipboard(text, element) {
+    // Get the parameter prefix from the closest toggleable content
+    const toggleableContent = element.closest('.sk-toggleable__content');
+    const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+    const fullParamName = paramPrefix ? `${paramPrefix}${text}` : text;
+
+    const originalStyle = element.style;
+    const computedStyle = window.getComputedStyle(element);
+    const originalWidth = computedStyle.width;
+    const originalHTML = element.innerHTML.replace('Copied!', '');
+
+    navigator.clipboard.writeText(fullParamName)
+        .then(() => {
+            element.style.width = originalWidth;
+            element.style.color = 'green';
+            element.innerHTML = "Copied!";
+
+            setTimeout(() => {
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 2000);
+        })
+        .catch(err => {
+            console.error('Failed to copy:', err);
+            element.style.color = 'red';
+            element.innerHTML = "Failed!";
+            setTimeout(() => {
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 2000);
+        });
+    return false;
+}
+
+document.querySelectorAll('.copy-paste-icon').forEach(function(element) {
+    const toggleableContent = element.closest('.sk-toggleable__content');
+    const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+
+    const parent = element.parentElement;
+    if (!parent || !parent.nextElementSibling) {
+        console.warn('Expected copy-paste icon is missing from the DOM structure');
+        return;
+    }
+
+    const paramName = element.parentElement.nextElementSibling
+        .textContent.trim().split(' ')[0];
+    const fullParamName = paramPrefix ? `${paramPrefix}${paramName}` : paramName;
+
+    element.setAttribute('title', fullParamName);
+});
+
+/**
+ * Copy the list of feature names formatted as a Python list.
+ *
+ * @param {HTMLElement} element - The copy button inside a `.features` block; its siblings
+ *   contain a `details` element and a table containing feature named.
+ * @returns {boolean} Always returns `false` so callers can prevent the default click behavior.
+ */
+function copyFeatureNamesToClipboard(element) {
+    var detailsElem = element.closest('.features').querySelector('details');
+    var wasOpen = detailsElem.open;
+    detailsElem.open = true;
+    var content = element.closest('.features').querySelector('tbody')
+                  .innerText.trim();
+    if (!wasOpen) detailsElem.open = false;
+    const rows = content.split('\n').map(row => `    "${row}"`);
+    const formattedText = `[\n${rows.join(',\n')},\n]`;
+    const originalHTML = element.innerHTML.replace('✔', '');
+    const originalStyle = element.style;
+    const copyMark = document.createElement('span');
+    copyMark.innerHTML = '✔';
+    copyMark.style.color = 'blue';
+    copyMark.style.fontSize = '1em';
+
+    navigator.clipboard.writeText(formattedText)
+        .then(() => {
+            element.style.display = 'none';
+            element.parentElement.appendChild(copyMark);
+
+            setTimeout(() => {
+                copyMark.remove();
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 1000);
+        })
+        .catch(err => {
+            console.error('Failed to copy:', err);
+            element.style.color = 'orange';
+            element.innerHTML = "Failed!";
+            setTimeout(() => {
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 1000);
+        });
+    return false;
+}
+/**
+ * Adapted from Skrub
+ * https://github.com/skrub-data/skrub/blob/403466d1d5d4dc76a7ef569b3f8228db59a31dc3/skrub/_reporting/_data/templates/report.js#L789
+ * @returns "light" or "dark"
+ */
+function detectTheme(element) {
+    const body = document.querySelector('body');
+
+    // Check VSCode theme
+    const themeKindAttr = body.getAttribute('data-vscode-theme-kind');
+    const themeNameAttr = body.getAttribute('data-vscode-theme-name');
+
+    if (themeKindAttr && themeNameAttr) {
+        const themeKind = themeKindAttr.toLowerCase();
+        const themeName = themeNameAttr.toLowerCase();
+
+        if (themeKind.includes("dark") || themeName.includes("dark")) {
+            return "dark";
+        }
+        if (themeKind.includes("light") || themeName.includes("light")) {
+            return "light";
+        }
+    }
+
+    // Check Jupyter theme
+    if (body.getAttribute('data-jp-theme-light') === 'false') {
+        return 'dark';
+    } else if (body.getAttribute('data-jp-theme-light') === 'true') {
+        return 'light';
+    }
+
+    // Guess based on a parent element's color
+    const color = window.getComputedStyle(element.parentNode, null).getPropertyValue('color');
+    const match = color.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)\s*$/i);
+    if (match) {
+        const [r, g, b] = [
+            parseFloat(match[1]),
+            parseFloat(match[2]),
+            parseFloat(match[3])
+        ];
+
+        // https://en.wikipedia.org/wiki/HSL_and_HSV#Lightness
+        const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+
+        if (luma > 180) {
+            // If the text is very bright we have a dark theme
+            return 'dark';
+        }
+        if (luma < 75) {
+            // If the text is very dark we have a light theme
+            return 'light';
+        }
+        // Otherwise fall back to the next heuristic.
+    }
+
+    // Fallback to system preference
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+
+function forceTheme(elementId) {
+    const estimatorElement = document.querySelector(`#${elementId}`);
+    if (estimatorElement === null) {
+        console.error(`Element with id ${elementId} not found.`);
+    } else {
+        const theme = detectTheme(estimatorElement);
+        estimatorElement.classList.add(theme);
+    }
+}
+
+forceTheme('sk-container-id-11');</script></body>
+  </body>
+</html>
+    
