@@ -102,3 +102,39 @@ Your submission will be evaluated based on:
 * Clarity and depth of reflection in the report
 
 Model accuracy alone is *not* a grading criterion.
+
+---
+
+## How to run this project
+
+The training code is `fernando_ml.py`, packaged as an MLflow Project (`MLProject`). The environment is defined in `python_env.yaml` (Python 3.13) and `requirements.txt` (pinned versions).
+
+**1. Start the MLflow tracking server** (keep this terminal open):
+
+```bash
+mlflow server --host 127.0.0.1 --port 5000
+```
+
+**2. Train, compare and register the best model** (in a second terminal, from the project folder). This creates a fresh environment from `python_env.yaml`, trains Ridge, Random Forest and XGBoost, logs all metrics to MLflow, registers the best model (lowest mean CV MAE) as `OrkneyWindForecastModel` and writes the future predictions to `plots/`:
+
+```bash
+mlflow run . --env-manager uv
+```
+
+- `--env-manager uv` needs only [uv](https://docs.astral.sh/uv/) installed. The default `mlflow run .` uses `virtualenv`, which additionally requires `pyenv`.
+- If the dependencies are already installed in your current Python environment, you can skip creating one: `mlflow run . --env-manager local`.
+- Use another dataset folder with `-P data_path=<folder>`.
+
+**3. Serve the registered model** (use the version number printed at the end of training):
+
+```bash
+export MLFLOW_TRACKING_URI=http://localhost:5000        # PowerShell: $env:MLFLOW_TRACKING_URI="http://localhost:5000"
+mlflow models serve -m "models:/OrkneyWindForecastModel/<version>" -p 5001 --env-manager local
+```
+
+**4. Request a forecast** from the prediction endpoint:
+
+```bash
+curl -X POST http://127.0.0.1:5001/invocations -H "Content-Type: application/json" \
+  -d '{"dataframe_split": {"columns": ["Direction","Speed"], "data": [["SSE", 11.176]]}}'
+```

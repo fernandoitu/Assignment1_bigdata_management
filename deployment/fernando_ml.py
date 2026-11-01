@@ -3,18 +3,22 @@ import os
 import matplotlib.pyplot as plt
 import mlflow
 import mlflow.sklearn
+from mlflow import MlflowClient
 from mlflow.models import infer_signature
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from sklearn.metrics import mean_absolute_error, root_mean_squared_error
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_absolute_error, r2_score, root_mean_squared_error
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import FunctionTransformer, OrdinalEncoder, StandardScaler
 from xgboost import XGBRegressor
 
 # --- CLI Arguments Setup ---
-parser = argparse.ArgumentParser(description="Train and evaluate wind power forecasting pipeline.")
+parser = argparse.ArgumentParser(description="Train, compare and register wind power forecasting pipelines.")
 parser.add_argument(
     "--data-path",
     type=str,
@@ -28,6 +32,17 @@ power_path = os.path.join(data_dir, "power.csv")
 weather_path = os.path.join(data_dir, "weather.csv")
 future_path = os.path.join(data_dir, "future.csv")
 
+# --- Pipeline settings (all of them are logged as MLflow parameters) ---
+RESAMPLE_FREQ = "3h"
+INTERPOLATION_LIMIT = 2  # max. consecutive 3h blocks (6 hours) that are filled by interpolation
+TRAIN_FRACTION = 0.8
+N_SPLITS = 5
+SEED = 42
+
+# The 16 compass points in clockwise order, so that index * 22.5 degrees is the meteorological angle
+COMPASS = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+           "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
+
 
 def read_csv_with_time_index(path):
     """Helper to read CSVs with a datetime index."""
@@ -35,6 +50,45 @@ def read_csv_with_time_index(path):
     df.index = pd.to_datetime(df.index)
     df.sort_index(inplace=True)
     return df
+
+
+def index_to_sin_cos(idx):
+    """Map a compass index (0..15) to a point on the unit circle: (sin, cos) of its angle in radians."""
+    angle = idx * 2 * np.pi / len(COMPASS)
+    return np.hstack([np.sin(angle), np.cos(angle)])
+
+
+def build_processors():
+    """Preprocessing for the linear model (scaled speed) and for the tree models (unscaled speed)."""
+    # Direction: label -> index (unknown or missing -> NaN) -> impute -> radians -> (sin, cos)
+    def direction_pipe():
+        return Pipeline([
+            ("ordinal", OrdinalEncoder(categories=[COMPASS],
+                                       handle_unknown="use_encoded_value",
+                                       unknown_value=np.nan)),
+            ("imputer", SimpleImputer(strategy="most_frequent")),
+            ("sincos", FunctionTransformer(index_to_sin_cos)),
+        ])
+
+    linear_processor = ColumnTransformer([
+        ("dir", direction_pipe(), ["Direction"]),
+        ("speed", Pipeline([("imputer", SimpleImputer(strategy="median")),
+                            ("scaler", StandardScaler())]), ["Speed"]),
+    ])
+    tree_processor = ColumnTransformer([
+        ("dir", direction_pipe(), ["Direction"]),
+        ("speed", SimpleImputer(strategy="median"), ["Speed"]),
+    ])
+    return linear_processor, tree_processor
+
+
+def evaluate(y_true, y_pred):
+    """The same three regression metrics for every model."""
+    return {
+        "MAE": float(mean_absolute_error(y_true, y_pred)),
+        "RMSE": float(root_mean_squared_error(y_true, y_pred)),
+        "R2": float(r2_score(y_true, y_pred)),
+    }
 
 
 def create_eda_plots(joined_dfs):
@@ -79,22 +133,22 @@ def create_eda_plots(joined_dfs):
 
 
 # MLflow setup
-mlflow.set_tracking_uri("http://127.0.0.1:5000")
+mlflow.set_tracking_uri(os.environ.get("MLFLOW_TRACKING_URI", "http://127.0.0.1:5000"))
 if not os.environ.get("MLFLOW_RUN_ID"):
     mlflow.set_experiment("orkney_wind_power")
 
 REGISTERED_MODEL_NAME = "OrkneyWindForecastModel"
-MODEL_LABEL = "XGBoost"
 
-with mlflow.start_run(run_name=MODEL_LABEL, nested=True):
+# The parent run holds the shared settings and artifacts; every model gets its own nested run.
+with mlflow.start_run(run_name="model_comparison"):
     print(f"Loading data from {data_dir}...")
     power_df = read_csv_with_time_index(power_path)
     wind_df = read_csv_with_time_index(weather_path)
 
     print("Starting preprocessing...")
     # Resample to 3h average, interpolate brief gaps, align indices
-    joined_dfs = power_df[["Total"]].resample("3h").mean()
-    joined_dfs["Total"] = joined_dfs["Total"].interpolate(method="time", limit=2)
+    joined_dfs = power_df[["Total"]].resample(RESAMPLE_FREQ).mean()
+    joined_dfs["Total"] = joined_dfs["Total"].interpolate(method="time", limit=INTERPOLATION_LIMIT)
     joined_dfs = joined_dfs.dropna(subset=["Total"])
     joined_dfs = joined_dfs.join(wind_df, how="inner")
     joined_dfs = joined_dfs.drop(columns=["Lead_hours", "Source_time"], errors="ignore")
@@ -111,84 +165,122 @@ with mlflow.start_run(run_name=MODEL_LABEL, nested=True):
     X = joined_dfs[["Direction", "Speed"]]
     y = joined_dfs["Total"]
 
-    # Temporal 80/20 train-test split
-    index_split = int(len(joined_dfs) * 0.8)
+    # Temporal train/test split (the test set is the latest part of the time series)
+    index_split = int(len(joined_dfs) * TRAIN_FRACTION)
     X_train, X_test = X.iloc[:index_split], X.iloc[index_split:]
     y_train, y_test = y.iloc[:index_split], y.iloc[index_split:]
 
-    # Pipeline definition
-    tree_processor = ColumnTransformer(
-        transformers=[
-            ("cat", OneHotEncoder(handle_unknown="ignore"), ["Direction"]),
-            ("num", "passthrough", ["Speed"]),
-        ]
-    )
+    mlflow.log_params({
+        "data_path": data_dir,
+        "resample_freq": RESAMPLE_FREQ,
+        "interpolation_limit": INTERPOLATION_LIMIT,
+        "train_fraction": TRAIN_FRACTION,
+        "n_splits": N_SPLITS,
+        "n_rows": len(joined_dfs),
+        "n_train": len(X_train),
+        "n_test": len(X_test),
+        "selection_metric": "Mean_CV_MAE",
+    })
 
-    pipeline = Pipeline([
-        ("preprocessor", tree_processor),
-        ("regressor", XGBRegressor(n_estimators=100, random_state=42)),
-    ])
+    linear_processor, tree_processor = build_processors()
+    models = [
+        ("Ridge", Ridge(), linear_processor),
+        ("RandomForest", RandomForestRegressor(random_state=SEED), tree_processor),
+        ("XGBoost", XGBRegressor(random_state=SEED), tree_processor),
+    ]
 
-    print("Starting 5-fold TimeSeries cross-validation...")
-    tscv = TimeSeriesSplit(n_splits=5)
-    cv_mae_scores = []
+    tscv = TimeSeriesSplit(n_splits=N_SPLITS)
+    results = {}
 
-    for train_idx, val_idx in tscv.split(X_train):
-        X_tr, X_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
-        y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
+    for model_name, regressor, processor in models:
+        pipeline = Pipeline([("preprocessor", processor), ("regressor", regressor)])
 
-        pipeline.fit(X_tr, y_tr)
-        preds_val = pipeline.predict(X_val)
-        cv_mae_scores.append(mean_absolute_error(y_val, preds_val))
+        with mlflow.start_run(run_name=model_name, nested=True):
+            print(f"Training {model_name}...")
+            mlflow.log_param("model", model_name)
+            mlflow.log_params({
+                k: v for k, v in regressor.get_params().items()
+                if isinstance(v, (int, float, str, bool, type(None)))
+            })
 
-    mean_mae = float(np.mean(cv_mae_scores))
-    std_mae = float(np.std(cv_mae_scores))
+            # 5-fold temporal cross-validation (each fold trains on the past and validates on the next block)
+            cv_scores = {"MAE": [], "RMSE": [], "R2": []}
+            for train_idx, val_idx in tscv.split(X):
+                pipeline.fit(X.iloc[train_idx], y.iloc[train_idx])
+                fold_scores = evaluate(y.iloc[val_idx], pipeline.predict(X.iloc[val_idx]))
+                for metric, value in fold_scores.items():
+                    cv_scores[metric].append(value)
 
-    mlflow.log_metric("Mean_CV_MAE", mean_mae)
-    mlflow.log_metric("Std_CV_MAE", std_mae)
-    print(f"{MODEL_LABEL} -> Mean CV MAE: {mean_mae:.2f} MW (+/- {std_mae:.2f})")
+            for metric, values in cv_scores.items():
+                mlflow.log_metric(f"Mean_CV_{metric}", float(np.mean(values)))
+                mlflow.log_metric(f"Std_CV_{metric}", float(np.std(values)))
 
-    print("Fitting final model on complete training set...")
-    pipeline.fit(X_train, y_train)
+            # Final model: fit on the whole training split, evaluate once on the held-out test split
+            pipeline.fit(X_train, y_train)
+            predictions = pipeline.predict(X_test)
+            test_scores = evaluate(y_test, predictions)
+            for metric, value in test_scores.items():
+                mlflow.log_metric(f"Test_{metric}", value)
 
-    print("Evaluating on test set...")
-    predictions = pipeline.predict(X_test)
-    test_mae = float(mean_absolute_error(y_test, predictions))
-    test_rmse = float(root_mean_squared_error(y_test, predictions))
+            # The preprocessing contains a custom function, so the model is stored with cloudpickle
+            signature = infer_signature(X_train.head(5), pipeline.predict(X_train.head(5)))
+            model_info = mlflow.sklearn.log_model(
+                sk_model=pipeline,
+                name="model",
+                signature=signature,
+                input_example=X_train.head(1),
+                serialization_format="cloudpickle",
+            )
 
-    mlflow.log_metric("Test_MAE", test_mae)
-    mlflow.log_metric("Test_RMSE", test_rmse)
+            results[model_name] = {
+                "pipeline": pipeline,
+                "predictions": predictions,
+                "model_uri": model_info.model_uri,
+                "cv_mae": float(np.mean(cv_scores["MAE"])),
+                "cv_mae_std": float(np.std(cv_scores["MAE"])),
+                "cv_rmse": float(np.mean(cv_scores["RMSE"])),
+                "cv_r2": float(np.mean(cv_scores["R2"])),
+                **{f"test_{k.lower()}": v for k, v in test_scores.items()},
+            }
 
-    # Log and register model with an inferred signature for serving
-    signature = infer_signature(X_train.head(5), pipeline.predict(X_train.head(5)))
-    mlflow.sklearn.log_model(
-        sk_model=pipeline,
-        name="model",
-        signature=signature,
-        input_example=X_train.head(1),
-        registered_model_name=REGISTERED_MODEL_NAME,
-        skops_trusted_types=['xgboost.core.Booster', 'xgboost.sklearn.XGBRegressor'],
-    )
+    # Compare the models. The best one is selected by cross-validated MAE (validation folds),
+    # the test split is kept as an independent check of the chosen model.
+    print(f"\n{'model':<13} {'CV MAE':>14} {'CV RMSE':>8} {'CV R2':>7} | {'Test MAE':>8} {'Test RMSE':>9} {'Test R2':>8}")
+    for name, r in results.items():
+        print(f"{name:<13} {r['cv_mae']:>7.2f} +/- {r['cv_mae_std']:.2f} {r['cv_rmse']:>8.2f} {r['cv_r2']:>7.3f} | "
+              f"{r['test_mae']:>8.2f} {r['test_rmse']:>9.2f} {r['test_r2']:>8.3f}")
 
-    # Plot test predictions vs ground truth
+    best_name = min(results, key=lambda n: results[n]["cv_mae"])
+    best = results[best_name]
+    print(f"\nBest model: {best_name} (lowest mean CV MAE: {best['cv_mae']:.2f} MW)")
+    mlflow.set_tag("best_model", best_name)
+
+    # Register the best model in the MLflow Model Registry
+    model_version = mlflow.register_model(best["model_uri"], REGISTERED_MODEL_NAME)
+    MlflowClient().set_model_version_tag(REGISTERED_MODEL_NAME, model_version.version, "model_type", best_name)
+    print(f"Registered '{REGISTERED_MODEL_NAME}' version {model_version.version} ({best_name}).")
+
+    # Plot test predictions vs ground truth for the best model
     plt.figure(figsize=(15, 4))
-    plt.plot(np.arange(len(predictions)), predictions, label="Predictions")
-    plt.plot(np.arange(len(y_test)), y_test.values, label="Truth")
-    plt.title("XGBoost Predictions vs Ground Truth")
+    plt.plot(y_test.index, best["predictions"], label="Predictions")
+    plt.plot(y_test.index, y_test.values, label="Truth")
+    plt.title(f"{best_name} Predictions vs Ground Truth (test set)")
+    plt.xticks(rotation=45)
     plt.legend()
+    plt.tight_layout()
     plt.savefig("plots/predictions.png")
     plt.close()
     mlflow.log_artifact("plots/predictions.png")
 
-    # Generate predictions on future.csv (per assignment criteria)
+    # Generate predictions on future.csv with the best model (per assignment criteria)
     if os.path.exists(future_path):
         future_df = read_csv_with_time_index(future_path)
         future_X = future_df[["Direction", "Speed"]]
-        future_preds = pipeline.predict(future_X)
-        future_df["Predicted_Total"] = future_preds
+        future_df["Predicted_Power"] = best["pipeline"].predict(future_X)
         future_df.to_csv("plots/future_predictions.csv")
         mlflow.log_artifact("plots/future_predictions.csv")
-        print("Future forecast generated and logged successfully.")
+        print("First 10 predictions on future.csv:")
+        print(future_df[["Direction", "Speed", "Predicted_Power"]].head(10).to_string())
     else:
         print(f"Warning: {future_path} not found. Skipping future predictions.")
 

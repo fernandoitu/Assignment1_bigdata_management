@@ -1,5 +1,7 @@
 name: orkney_wind_forecast
 
+python_env: python_env.yaml
+
 entry_points:
   main:
     parameters:
